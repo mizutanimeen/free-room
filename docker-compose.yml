@@ -5,3 +5,8 @@ services:
     tty: true
     ports:
       - '8080:8080'
+  react:
+      build: ./react
+      tty: true
+      ports:
+        - 3000:3000
