@@ -4,4 +4,6 @@ COPY ./app /react/app
 
 WORKDIR /react/app
 
-CMD sh -c "npm install && npm start"
+RUN yarn install
+
+CMD sh -c "yarn start"
