@@ -1,4 +1,9 @@
 FROM mysql:8.0
-ENV LANG=ja_JP.UTF-8
+ENV LANG=ja_JP.UTF-8 \
+    MYSQL_DATABASE=main_database \
+    MYSQL_USER=test_user \
+    MYSQL_PASSWORD=password \
+    MYSQL_USERS_TABLES=users \
+    MYSQL_ROOT_PASSWORD=root_password
 
 COPY ./init /docker-entrypoint-initdb.d

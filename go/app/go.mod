@@ -1,4 +1,4 @@
-module ideatech
+module github.com/mizutanimeen/free-room
 
 go 1.19
 
