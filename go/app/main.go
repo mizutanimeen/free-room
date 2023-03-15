@@ -14,7 +14,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	logFile "github.com/mizutanimeen/free-room/log"
+	logFile "github.com/mizutanimeen/free-room/logs"
 	"github.com/mizutanimeen/free-room/server"
 )
 
