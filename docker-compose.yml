@@ -2,6 +2,8 @@ version: "3.8"
 services:
   go:
     build: ./go
+    env_file: 
+      - .env
     tty: true
     volumes:
       - ./go/app/logs/data:/go/app/logs/data
@@ -12,6 +14,8 @@ services:
   react:
     build: ./react
     tty: true
+    env_file: 
+      - .env
     volumes:
       - ./react/app:/react/app
     ports:
@@ -19,6 +23,8 @@ services:
   db:
     build: ./db
     tty: true
+    env_file: 
+      - .env
     volumes:
       - ./db/data:/var/lib/mysql
     ports:

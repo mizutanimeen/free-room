@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/go-sql-driver/mysql"
+
 	"github.com/mizutanimeen/free-room/controllers"
 	"github.com/mizutanimeen/free-room/models"
 )

@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// controllerの要件チェックで利用中。type変える時はここも変える
+// 要件チェックで利用中。type変える時はここも変える
 const (
 	EMAIL    = "Email"
 	NAME     = "Name"

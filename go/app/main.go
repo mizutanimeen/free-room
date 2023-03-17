@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-chi/cors"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/joho/godotenv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -31,11 +30,6 @@ func main() {
 	}(tLogFile)
 
 	log.Println("--------------Log Start--------------")
-
-	//環境変数読み込み
-	if tError := godotenv.Load(".env"); tError != nil {
-		log.Fatalf("%s\n", tError.Error())
-	}
 
 	//DB接続
 	tDb, tError := db.Open()
