@@ -14,7 +14,7 @@ func GetSignUpUser(aRequests *http.Request) (*models.SignUpUser, int, error) {
 	case "application/json":
 		var tStatus int
 		var tError error
-		tSignUpUser, tStatus, tError = JsonToSignUpUser(aRequests)
+		tSignUpUser, tStatus, tError = jsonToSignUpUser(aRequests)
 		if tError != nil {
 			return nil, tStatus, tError
 		}
@@ -26,7 +26,7 @@ func GetSignUpUser(aRequests *http.Request) (*models.SignUpUser, int, error) {
 }
 
 // bodyがjsonのrequestからstruct userを作る
-func JsonToSignUpUser(aRequests *http.Request) (*models.SignUpUser, int, error) {
+func jsonToSignUpUser(aRequests *http.Request) (*models.SignUpUser, int, error) {
 	tBody := make([]byte, aRequests.ContentLength)
 	aRequests.Body.Read(tBody)
 

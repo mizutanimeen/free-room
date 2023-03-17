@@ -50,6 +50,8 @@ func main() {
 		log.Printf("データベース接続成功\n")
 	}
 
+	tServer := server.New(tDb)
+
 	//ルーティング
 	tRouter := chi.NewRouter()
 	tRouter.Use(cors.Handler(cors.Options{
@@ -62,9 +64,9 @@ func main() {
 	}))
 	tRouter.Use(middleware.Logger)
 	tRouter.Route("/free-room/api/v1", func(tRouter chi.Router) {
-		tRouter.Get("/", server.TestGet)
-		tRouter.Post("/", server.TestPost)
-		tRouter.Post("/signup", server.SignUp)
+		tRouter.Get("/", tServer.TestGet)
+		tRouter.Post("/", tServer.TestPost)
+		tRouter.Post("/signup", tServer.SignUp)
 	})
 	http.ListenAndServe(":8080", tRouter)
 }

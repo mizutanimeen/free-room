@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,12 +10,22 @@ import (
 	"github.com/mizutanimeen/free-room/models"
 )
 
+type Server struct {
+	Db *sql.DB
+}
+
+func New(aDb *sql.DB) *Server {
+	return &Server{
+		Db: aDb,
+	}
+}
+
 type Ping struct {
 	Status int    `json:"status"`
 	Result string `json:"result"`
 }
 
-func TestGet(w http.ResponseWriter, r *http.Request) {
+func (aServer *Server) TestGet(w http.ResponseWriter, r *http.Request) {
 	tPing := &Ping{http.StatusOK, "ok"}
 
 	tPingByte, tError := json.Marshal(tPing)
@@ -33,7 +44,7 @@ func TestGet(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func TestPost(w http.ResponseWriter, r *http.Request) {
+func (aServer *Server) TestPost(w http.ResponseWriter, r *http.Request) {
 	tBody := make([]byte, r.ContentLength)
 	r.Body.Read(tBody)
 
@@ -46,7 +57,7 @@ func TestPost(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func SignUp(aResWriter http.ResponseWriter, aRequests *http.Request) {
+func (aServer *Server) SignUp(aResWriter http.ResponseWriter, aRequests *http.Request) {
 	tSignUpUser, tStatus, tError := controllers.GetSignUpUser(aRequests)
 	if tError != nil {
 		http.Error(aResWriter, tError.Error(), tStatus)
