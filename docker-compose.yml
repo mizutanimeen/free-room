@@ -4,7 +4,7 @@ services:
     build: ./go
     tty: true
     volumes:
-      - ./go/app/log/data:/go/app/log/data
+      - ./go/app/logs/data:/go/app/logs/data
     depends_on:
       - db
     ports:

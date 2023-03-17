@@ -20,7 +20,7 @@ import (
 
 func main() {
 	//ログ出力先設定
-	tLogFile, tError := logFile.Settings("./log/data/go.log")
+	tLogFile, tError := logFile.Settings("./logs/data/go.log")
 	defer func(aLogFile *os.File) {
 		if tError := aLogFile.Close(); tError != nil {
 			log.Fatalf("%s\n", tError.Error())
@@ -68,5 +68,3 @@ func main() {
 	})
 	http.ListenAndServe(":8080", tRouter)
 }
-
-//セッションベース OAuth OpenID

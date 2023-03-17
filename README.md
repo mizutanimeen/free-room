@@ -13,3 +13,5 @@
 何か -> controller -> struct & interface? -> main的なとこ(ココが一番上のレイヤー？) -> struct & interface -> structを作る処理 -> struct -> なんかのライター
 
 何かの例http -> json -> 
+
+react : javascript -> typescript
