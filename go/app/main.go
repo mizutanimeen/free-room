@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/mizutanimeen/free-room/db"
 	logFile "github.com/mizutanimeen/free-room/logs"
 	"github.com/mizutanimeen/free-room/server"
 )
@@ -21,14 +21,14 @@ import (
 func main() {
 	//ログ出力先設定
 	tLogFile, tError := logFile.Settings("./logs/data/go.log")
+	if tError != nil {
+		log.Fatalf("%s\n", tError.Error())
+	}
 	defer func(aLogFile *os.File) {
 		if tError := aLogFile.Close(); tError != nil {
 			log.Fatalf("%s\n", tError.Error())
 		}
 	}(tLogFile)
-	if tError != nil {
-		log.Fatalf("%s\n", tError.Error())
-	}
 
 	log.Println("--------------Log Start--------------")
 
@@ -38,17 +38,15 @@ func main() {
 	}
 
 	//DB接続
-	tDbPath := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_IP"), os.Getenv("MYSQL_DATABASE"))
-	tDb, tError := sql.Open("mysql", tDbPath)
-	defer tDb.Close()
+	tDb, tError := db.Open()
 	if tError != nil {
 		log.Fatalf("%s\n", tError.Error())
 	}
-	if tError = tDb.Ping(); tError != nil {
-		log.Fatalf("データベース接続失敗: %s\n", tError.Error())
-	} else {
-		log.Printf("データベース接続成功\n")
-	}
+	defer func(aDb *sql.DB) {
+		if tError := aDb.Close(); tError != nil {
+			log.Fatalf("%s\n", tError.Error())
+		}
+	}(tDb)
 
 	tServer := server.New(tDb)
 
