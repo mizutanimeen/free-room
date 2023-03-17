@@ -3,7 +3,7 @@ services:
   go:
     build: ./go
     env_file: 
-      - .env
+      - dev.env
     tty: true
     volumes:
       - ./go/app/logs/data:/go/app/logs/data
@@ -15,7 +15,7 @@ services:
     build: ./react
     tty: true
     env_file: 
-      - .env
+      - dev.env
     volumes:
       - ./react/app:/react/app
     ports:
@@ -24,7 +24,7 @@ services:
     build: ./db
     tty: true
     env_file: 
-      - .env
+      - dev.env
     volumes:
       - ./db/data:/var/lib/mysql
     ports:

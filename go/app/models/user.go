@@ -20,7 +20,7 @@ type User struct {
 	Email    string    `json:"email"`
 	Name     string    `json:"name"`
 	Password string    `json:"password"`
-	Setting  int       `json:"setting"`
+	Setting  string    `json:"setting"`
 	CreateAt time.Time `json:"create_at"`
 	UpdateAt time.Time `json:"update_at"`
 }
@@ -29,11 +29,29 @@ type SignUpUser struct {
 	Email    string `json:"email"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
-	Setting  int    `json:"setting"`
+	Setting  string `json:"setting"`
+}
+
+// フィールドの数
+func (aSignUpUser *SignUpUser) Len() int {
+	return reflect.ValueOf(*aSignUpUser).Type().NumField()
+}
+
+// フィールドの値全て取得
+func (aSignUpUser *SignUpUser) GetAll() []string {
+	tValues := []string{}
+	tReValues := reflect.ValueOf(*aSignUpUser)
+	tReTypes := tReValues.Type()
+	for i := 0; i < tReTypes.NumField(); i++ {
+		tTypeName := tReTypes.Field(i).Name
+		tVal := tReValues.FieldByName(tTypeName).String()
+		tValues = append(tValues, tVal)
+	}
+	return tValues
 }
 
 // 値が要件を満たしているかチェック
-func SignUpConditionCheck(aSignUpUser *SignUpUser) (int, error) {
+func (aSignUpUser *SignUpUser) ConditionCheck() (int, error) {
 	tValues := reflect.ValueOf(*aSignUpUser)
 	tTypes := tValues.Type()
 	for i := 0; i < tTypes.NumField(); i++ {

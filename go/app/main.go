@@ -29,8 +29,6 @@ func main() {
 		}
 	}(tLogFile)
 
-	log.Println("--------------Log Start--------------")
-
 	//DB接続
 	tDb, tError := db.Open()
 	if tError != nil {
@@ -56,9 +54,13 @@ func main() {
 	}))
 	tRouter.Use(middleware.Logger)
 	tRouter.Route("/free-room/api/v1", func(tRouter chi.Router) {
-		tRouter.Get("/", tServer.TestGet)
-		tRouter.Post("/", tServer.TestPost)
+		tRouter.Get("/", server.TestGet)
+		tRouter.Post("/", server.TestPost)
 		tRouter.Post("/signup", tServer.SignUp)
 	})
-	http.ListenAndServe(":8080", tRouter)
+
+	log.Println("--------------Server Start--------------")
+	if tError := http.ListenAndServe(":8080", tRouter); tError != nil {
+		log.Fatalf("%s\n", tError.Error())
+	}
 }

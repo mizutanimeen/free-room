@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/mizutanimeen/free-room/controllers"
-	"github.com/mizutanimeen/free-room/models"
+	"github.com/mizutanimeen/free-room/db"
 )
 
 type Server struct {
@@ -27,7 +27,8 @@ type Ping struct {
 	Result string `json:"result"`
 }
 
-func (aServer *Server) TestGet(w http.ResponseWriter, r *http.Request) {
+func TestGet(w http.ResponseWriter, r *http.Request) {
+	log.Println("TestGet")
 	tPing := &Ping{http.StatusOK, "ok"}
 
 	tPingByte, tError := json.Marshal(tPing)
@@ -46,7 +47,7 @@ func (aServer *Server) TestGet(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (aServer *Server) TestPost(w http.ResponseWriter, r *http.Request) {
+func TestPost(w http.ResponseWriter, r *http.Request) {
 	tBody := make([]byte, r.ContentLength)
 	r.Body.Read(tBody)
 
@@ -63,13 +64,21 @@ func (aServer *Server) SignUp(aResWriter http.ResponseWriter, aRequests *http.Re
 	tSignUpUser, tStatus, tError := controllers.GetSignUpUser(aRequests)
 	if tError != nil {
 		http.Error(aResWriter, tError.Error(), tStatus)
+		return
 	}
 
-	if tStatus, tError := models.SignUpConditionCheck(tSignUpUser); tError != nil {
-		http.Error(aResWriter, tError.Error(), tStatus)
-	}
+	// if tStatus, tError := tSignUpUser.ConditionCheck(); tError != nil {
+	// 	http.Error(aResWriter, tError.Error(), tStatus)
+	// 	return
+	// }
 
 	//パスワードのハッシュ化
+
+	if tStatus, tError := db.SaveSignUpUser(tSignUpUser, aServer.Db); tError != nil { //データが重複したときの例外処理、react側が欲しいなら渡すように
+		log.Println(tError)
+		http.Error(aResWriter, tError.Error(), tStatus)
+		return
+	}
 
 	//URLを作成、URLを登録するメールに送信、GETを検知、時間が３０分以内か確認、DBに保存
 	//URLは /signup/email?xxx=yyyyyyyyyyみたいにするのかな？
@@ -81,6 +90,7 @@ func (aServer *Server) SignUp(aResWriter http.ResponseWriter, aRequests *http.Re
 	//認証コードもあり
 
 	//セッションベース OAuth OpenID
-	log.Println(tSignUpUser)
+	log.Println("Sign Up OK")
+	aResWriter.WriteHeader(http.StatusCreated)
 	return
 }
