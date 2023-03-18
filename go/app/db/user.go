@@ -42,3 +42,48 @@ func getQueryValues(aLen int) string {
 	tValues += "?)"
 	return tValues
 }
+
+func GetAllUsers(aDb *sql.DB) ([]*models.User, int, error) {
+	tUsers, tStatus, tError := getUsersByWhere("", aDb)
+	if tError != nil {
+		return nil, tStatus, tError
+	}
+	return tUsers, 0, nil
+}
+
+func GetUserByID(aID string, aDb *sql.DB) (*models.User, int, error) {
+	tWhere := fmt.Sprintf("WHERE %s = %s", os.Getenv("MYSQL_USERS_TABLES_ID"), aID)
+	tUsers, tStatus, tError := getUsersByWhere(tWhere, aDb)
+	if tError != nil {
+		return nil, tStatus, tError
+	}
+
+	if len(tUsers) <= 0 {
+		return nil, http.StatusBadRequest, fmt.Errorf("%s is not found", aID)
+	} else if len(tUsers) >= 2 {
+		return nil, http.StatusInternalServerError, fmt.Errorf("%s is not unique", aID)
+	}
+
+	return tUsers[0], 0, nil
+}
+
+func getUsersByWhere(aWhere string, aDb *sql.DB) ([]*models.User, int, error) {
+	tQuery := fmt.Sprintf("SELECT * FROM %s %s", os.Getenv("MYSQL_USERS_TABLES"), aWhere)
+	tSqlRows, tError := aDb.Query(tQuery)
+	if tError != nil {
+		return nil, http.StatusInternalServerError, tError
+	}
+	defer tSqlRows.Close()
+
+	tUsers := []*models.User{}
+	for tSqlRows.Next() {
+		var tUser models.User
+
+		if tError := tSqlRows.Scan(&tUser.UserID, &tUser.Email, &tUser.Name, &tUser.Password, &tUser.Setting, &tUser.CreateAt, &tUser.UpdateAt); tError != nil {
+			return nil, http.StatusInternalServerError, tError
+		}
+
+		tUsers = append(tUsers, &tUser)
+	}
+	return tUsers, 0, nil
+}

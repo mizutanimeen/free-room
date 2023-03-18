@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/go-chi/chi/v5"
 	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/mizutanimeen/free-room/controllers"
@@ -60,23 +61,69 @@ func TestPost(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 }
 
-func (aServer *Server) SignUp(aResWriter http.ResponseWriter, aRequests *http.Request) {
-	tSignUpUser, tStatus, tError := controllers.GetSignUpUser(aRequests)
+func (aServer *Server) GetUsers(aResponseWriter http.ResponseWriter, aRequest *http.Request) {
+	tUsers, tStatus, tError := db.GetAllUsers(aServer.Db)
 	if tError != nil {
-		http.Error(aResWriter, tError.Error(), tStatus)
+		http.Error(aResponseWriter, tError.Error(), tStatus)
+	}
+
+	tUsersByte, tError := json.Marshal(tUsers)
+	if tError != nil {
+		http.Error(aResponseWriter, tError.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// if tStatus, tError := tSignUpUser.ConditionCheck(); tError != nil {
-	// 	http.Error(aResWriter, tError.Error(), tStatus)
-	// 	return
-	// }
+	aResponseWriter.Header().Set("Content-Type", "application/json")
+	aResponseWriter.WriteHeader(200)
+	if _, tError := aResponseWriter.Write(tUsersByte); tError != nil {
+		http.Error(aResponseWriter, tError.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	return
+}
+
+func (aServer *Server) GetUserByID(aResponseWriter http.ResponseWriter, aRequest *http.Request) {
+	tID := chi.URLParam(aRequest, "ID")
+
+	tUser, tStatus, tError := db.GetUserByID(tID, aServer.Db)
+	if tError != nil {
+		http.Error(aResponseWriter, tError.Error(), tStatus)
+	}
+
+	tUserByte, tError := json.Marshal(tUser)
+	if tError != nil {
+		http.Error(aResponseWriter, tError.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	aResponseWriter.Header().Set("Content-Type", "application/json")
+	aResponseWriter.WriteHeader(200)
+	if _, tError := aResponseWriter.Write(tUserByte); tError != nil {
+		http.Error(aResponseWriter, tError.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	return
+}
+
+func (aServer *Server) SignUp(aResponseWriter http.ResponseWriter, aRequest *http.Request) {
+	tSignUpUser, tStatus, tError := controllers.GetSignUpUser(aRequest)
+	if tError != nil {
+		http.Error(aResponseWriter, tError.Error(), tStatus)
+		return
+	}
+
+	if tStatus, tError := tSignUpUser.ConditionCheck(); tError != nil {
+		http.Error(aResponseWriter, tError.Error(), tStatus)
+		return
+	}
 
 	//パスワードのハッシュ化
 
 	if tStatus, tError := db.SaveSignUpUser(tSignUpUser, aServer.Db); tError != nil { //データが重複したときの例外処理、react側が欲しいなら渡すように
 		log.Println(tError)
-		http.Error(aResWriter, tError.Error(), tStatus)
+		http.Error(aResponseWriter, tError.Error(), tStatus)
 		return
 	}
 
@@ -90,7 +137,6 @@ func (aServer *Server) SignUp(aResWriter http.ResponseWriter, aRequests *http.Re
 	//認証コードもあり
 
 	//セッションベース OAuth OpenID
-	log.Println("Sign Up OK")
-	aResWriter.WriteHeader(http.StatusCreated)
+	aResponseWriter.WriteHeader(http.StatusCreated)
 	return
 }

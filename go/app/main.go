@@ -56,6 +56,8 @@ func main() {
 	tRouter.Route("/free-room/api/v1", func(tRouter chi.Router) {
 		tRouter.Get("/", server.TestGet)
 		tRouter.Post("/", server.TestPost)
+		tRouter.Get("/users", tServer.GetUsers)
+		tRouter.Get("/users/{ID}", tServer.GetUserByID)
 		tRouter.Post("/signup", tServer.SignUp)
 	})
 
